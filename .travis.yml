@@ -10,8 +10,10 @@ os:
 
 dist: bionic
 
+before_script:
+    - bash <(curl https://raw.githubusercontent.com/xd009642/tarpaulin/master/travis-install.sh)
+
 script:
-    - cargo install cargo-tarpaulin
     - cargo build --verbose
     - cargo tarpaulin --out Xml
     - bash <(curl -s https://codecov.io/bash)
