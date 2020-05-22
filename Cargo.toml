@@ -1,0 +1,47 @@
+[package]
+name = "laika"
+version = "0.1.0"
+authors = ["Ben Morrison <ben@gbmor.dev>"]
+license = "MIT OR Apache-2.0"
+edition = "2018"
+
+[dependencies]
+clap = "^2.33"
+ctrlc = "^3.1"
+lazy_static = "^1.1"
+tokio = { version = "^0.2", features = ["full"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+debug = false
+debug-assertions = false
+overflow-checks = false
+panic = "abort"
+incremental = true
+
+[profile.dev]
+opt-level = 0
+lto = false
+debug = true
+debug-assertions = true
+overflow-checks = true
+panic = "unwind"
+incremental = true
+
+[profile.bench]
+opt-level = 3
+lto = "thin"
+debug = false
+debug-assertions = false
+overflow-checks = false
+incremental = true
+
+[profile.test]
+opt-level = 0
+lto = false
+debug = true
+debug-assertions = true
+overflow-checks = true
+incremental = true
+
