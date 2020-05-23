@@ -1,0 +1,22 @@
+// Response codes
+const INPUT: usize = 10;
+const SUCCESS: usize = 20;
+const SUCCESS_END_OF_CLIENT_CERT_SESSION: usize = 21;
+const REDIRECT_TEMPORARY: usize = 30;
+const REDIRECT_PERMANENT: usize = 31;
+const TEMPORARY_FAILURE: usize = 40;
+const SERVER_UNAVAILABLE: usize = 41;
+const CGI_ERROR: usize = 42;
+const PROXY_ERROR: usize = 43;
+const SLOW_DOWN: usize = 44;
+const PERMANENT_FAILURE: usize = 50;
+const NOT_FOUND: usize = 51;
+const GONE: usize = 52;
+const PROXY_REQUEST_REFUSED: usize = 53;
+const BAD_REQUEST: usize = 59;
+const CLIENT_CERT_REQUIRED: usize = 60;
+const TRANSIENT_CERT_REQUESTED: usize = 61;
+const AUTHORISED_CERT_REQUIRED: usize = 62;
+const CERT_NOT_ACCEPTED: usize = 63;
+const FUTURE_CERT_REJECTED: usize = 64;
+const EXPIRED_CERT_REJECTED: usize = 65;

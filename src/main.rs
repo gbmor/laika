@@ -8,14 +8,15 @@ use async_std::{
 mod conf;
 mod handlers;
 
+#[allow(dead_code)]
+mod response;
+
 fn main() -> io::Result<()> {
     let conf = conf::Conf::get();
 
     println!();
     println!("{}", conf.vers);
     println!("github.com/gbmor/laika");
-    println!();
-    println!("{:?}", conf);
     eprintln!();
 
     // Handle sigint
