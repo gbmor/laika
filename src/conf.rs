@@ -1,7 +1,7 @@
 use async_std::io;
 use clap::{App, Arg};
 use rustls::{
-    internal::pemfile::{certs, rsa_private_keys},
+    internal::pemfile::{certs, pkcs8_private_keys},
     Certificate, NoClientAuth, PrivateKey, ServerConfig,
 };
 
@@ -99,9 +99,9 @@ impl Conf {
 
     // Pull private key
     fn get_key(path: &Path) -> io::Result<Vec<PrivateKey>> {
-        rsa_private_keys(&mut BufReader::new(File::open(path)?)).map_err(|_| {
-            io::Error::new(io::ErrorKind::InvalidInput, "invalid key")
-        })
+        pkcs8_private_keys(&mut BufReader::new(File::open(path)?)).map_err(
+            |_| io::Error::new(io::ErrorKind::InvalidInput, "invalid key"),
+        )
     }
 
     // Generate the tls server config
