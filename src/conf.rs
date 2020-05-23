@@ -70,7 +70,7 @@ impl Conf {
 
         Conf {
             vers: format!("laika {}", clap::crate_version!()),
-            ip: matches.value_of("ip").unwrap_or("127.0.0.1").into(),
+            ip: matches.value_of("ip").unwrap_or("0.0.0.0").into(),
             port: matches
                 .value_of("port")
                 .unwrap_or("1965")
@@ -121,5 +121,21 @@ impl Conf {
     pub fn tls_acceptor(&self) -> io::Result<TlsAcceptor> {
         let server_config = self.server_config()?;
         Ok(TlsAcceptor::from(Arc::new(server_config)))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn check_default_config() {
+        let conf = Conf::get();
+        assert_eq!(conf.ip, "0.0.0.0");
+        assert_eq!(conf.port, 1965);
+        assert_eq!(conf.logfile, "/tmp/laika.log");
+        assert_eq!(conf.rootdir, "/var/gemini");
+        assert_eq!(conf.tls_cert, "/etc/ssl/laika.pem");
+        assert_eq!(conf.tls_key, "/etc/ssl/private/laika.key");
     }
 }
