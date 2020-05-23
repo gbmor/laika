@@ -1,41 +1,12 @@
 use async_std::{
     io,
-    net::{TcpListener, TcpStream, ToSocketAddrs},
+    net::{TcpListener, ToSocketAddrs},
     prelude::*,
     task,
 };
-use async_tls::TlsAcceptor;
 
 mod conf;
-
-async fn echo(
-    acceptor: &TlsAcceptor,
-    tcp_stream: &mut TcpStream,
-) -> io::Result<()> {
-    let addr = tcp_stream.peer_addr()?;
-    println!("Conn from {}", addr);
-
-    let handshake = acceptor.accept(tcp_stream);
-
-    let mut tls_stream = handshake.await?;
-    let mut buf: [u8; 1024] = [0; 1024];
-
-    loop {
-        let n = match tls_stream.read(&mut buf).await {
-            Ok(n) if n == 0 => return Ok(()),
-            Ok(n) => n,
-            Err(e) => {
-                eprintln!("Failed to read from socket: {}", e);
-                return Err(e);
-            },
-        };
-
-        if let Err(e) = tls_stream.write_all(&buf[0..n]).await {
-            eprintln!("Failed to write to socket: {}", e);
-            return Err(e);
-        }
-    }
-}
+mod handlers;
 
 fn main() -> io::Result<()> {
     let conf = conf::Conf::get();
@@ -71,7 +42,7 @@ fn main() -> io::Result<()> {
             let mut stream = stream.unwrap();
 
             task::spawn(async move {
-                let result = echo(&acceptor, &mut stream).await;
+                let result = handlers::echo(&acceptor, &mut stream).await;
                 match result {
                     Ok(_) => {},
                     Err(e) => {
@@ -83,10 +54,4 @@ fn main() -> io::Result<()> {
     });
 
     Ok(())
-}
-
-#[test]
-fn it_works() {
-    // lol
-    assert!(true);
 }
