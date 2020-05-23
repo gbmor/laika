@@ -6,8 +6,6 @@ use async_std::{
 };
 use async_tls::TlsAcceptor;
 
-use std::sync::Arc;
-
 mod conf;
 
 async fn echo(
@@ -57,10 +55,8 @@ fn main() -> io::Result<()> {
     })
     .expect("Error initializing SIGINT handler");
 
-    let server_conf = conf.server_config()?;
-    let bind_addr = &format!("{}:{}", conf.ip, conf.port)[..];
-
-    let acceptor = TlsAcceptor::from(Arc::new(server_conf));
+    let bind_addr = format!("{}:{}", conf.ip, conf.port);
+    let acceptor = conf.tls_acceptor()?;
 
     task::block_on(async {
         let bind_addr = bind_addr.to_socket_addrs().await;

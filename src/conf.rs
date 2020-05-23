@@ -1,11 +1,12 @@
 use async_std::io;
+use async_tls::TlsAcceptor;
 use clap::{App, Arg};
 use rustls::{
     internal::pemfile::{certs, pkcs8_private_keys},
     Certificate, NoClientAuth, PrivateKey, ServerConfig,
 };
 
-use std::{fs::File, io::BufReader, path::Path};
+use std::{fs::File, io::BufReader, path::Path, sync::Arc};
 
 #[derive(Debug)]
 pub struct Conf {
@@ -105,7 +106,7 @@ impl Conf {
     }
 
     // Generate the tls server config
-    pub fn server_config(&self) -> io::Result<ServerConfig> {
+    fn server_config(&self) -> io::Result<ServerConfig> {
         let cert = Conf::get_cert(Path::new(&self.tls_cert))?;
         let mut key = Conf::get_key(Path::new(&self.tls_key))?;
 
@@ -114,5 +115,11 @@ impl Conf {
             .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
 
         Ok(conf)
+    }
+
+    // Return a TLS acceptor
+    pub fn tls_acceptor(&self) -> io::Result<TlsAcceptor> {
+        let server_config = self.server_config()?;
+        Ok(TlsAcceptor::from(Arc::new(server_config)))
     }
 }
