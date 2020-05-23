@@ -19,7 +19,7 @@ fn main() -> io::Result<()> {
     println!();
     println!("{}", conf.vers);
     println!("github.com/gbmor/laika");
-    eprintln!();
+    println!();
 
     log::info!("laika starting ...");
 
@@ -48,11 +48,11 @@ fn main() -> io::Result<()> {
             let mut stream = stream.unwrap();
 
             task::spawn(async move {
-                let result = handlers::echo(&acceptor, &mut stream).await;
+                let result = handlers::entrance(&acceptor, &mut stream).await;
                 match result {
                     Ok(_) => {},
                     Err(e) => {
-                        eprintln!("{:?}", e);
+                        log::error!("{:?}", e);
                     },
                 }
             });
