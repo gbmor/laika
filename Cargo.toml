@@ -6,10 +6,11 @@ license = "MIT OR Apache-2.0"
 edition = "2018"
 
 [dependencies]
+async-std = "^1.6"
+async-tls = "^0.7"
 clap = "^2.33"
 ctrlc = "^3.1"
-lazy_static = "^1.1"
-tokio = { version = "^0.2", features = ["full"] }
+rustls = "^0.17"
 
 [profile.release]
 opt-level = 3

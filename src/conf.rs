@@ -1,4 +1,11 @@
+use async_std::io;
 use clap::{App, Arg};
+use rustls::{
+    internal::pemfile::{certs, rsa_private_keys},
+    Certificate, NoClientAuth, PrivateKey, ServerConfig,
+};
+
+use std::{fs::File, io::BufReader, path::Path};
 
 #[derive(Debug)]
 pub struct Conf {
@@ -47,7 +54,7 @@ impl Conf {
                     .short("c")
                     .long("cert")
                     .value_name("TLS Certificate")
-                    .help("Path to TLS certificate")
+                    .help("Path to TLS certificate file")
                     .takes_value(true),
             )
             .arg(
@@ -55,7 +62,7 @@ impl Conf {
                     .short("k")
                     .long("key")
                     .value_name("TLS Private Key")
-                    .help("Path to TLS private key")
+                    .help("Path to TLS private key file")
                     .takes_value(true),
             )
             .get_matches();
@@ -74,12 +81,38 @@ impl Conf {
                 .into(),
             tls_cert: matches
                 .value_of("cert")
-                .unwrap_or("/etc/ssl/cert.pem")
+                .unwrap_or("/etc/ssl/laika.pem")
                 .into(),
             tls_key: matches
                 .value_of("key")
-                .unwrap_or("/etc/ssl/private/key.pem")
+                .unwrap_or("/etc/ssl/private/laika.key")
                 .into(),
         }
+    }
+
+    // Pull certificate file
+    fn get_cert(path: &Path) -> io::Result<Vec<Certificate>> {
+        certs(&mut BufReader::new(File::open(path)?)).map_err(|_| {
+            io::Error::new(io::ErrorKind::InvalidInput, "invalid cert")
+        })
+    }
+
+    // Pull private key
+    fn get_key(path: &Path) -> io::Result<Vec<PrivateKey>> {
+        rsa_private_keys(&mut BufReader::new(File::open(path)?)).map_err(|_| {
+            io::Error::new(io::ErrorKind::InvalidInput, "invalid key")
+        })
+    }
+
+    // Generate the tls server config
+    pub fn server_config(&self) -> io::Result<ServerConfig> {
+        let cert = Conf::get_cert(Path::new(&self.tls_cert))?;
+        let mut key = Conf::get_key(Path::new(&self.tls_key))?;
+
+        let mut conf = ServerConfig::new(NoClientAuth::new());
+        conf.set_single_cert(cert, key.remove(0))
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+
+        Ok(conf)
     }
 }

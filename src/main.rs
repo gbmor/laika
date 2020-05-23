@@ -1,12 +1,45 @@
-use ctrlc;
-use tokio::{net::TcpListener, prelude::*};
+use async_std::{
+    io,
+    net::{TcpListener, TcpStream, ToSocketAddrs},
+    prelude::*,
+    task,
+};
+use async_tls::TlsAcceptor;
+
+use std::sync::Arc;
 
 mod conf;
 
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+async fn echo(
+    acceptor: &TlsAcceptor,
+    tcp_stream: &mut TcpStream,
+) -> io::Result<()> {
+    let addr = tcp_stream.peer_addr()?;
+    println!("Conn from {}", addr);
 
-#[tokio::main]
-async fn main() -> Result<()> {
+    let handshake = acceptor.accept(tcp_stream);
+
+    let mut tls_stream = handshake.await?;
+    let mut buf: [u8; 1024] = [0; 1024];
+
+    loop {
+        let n = match tls_stream.read(&mut buf).await {
+            Ok(n) if n == 0 => return Ok(()),
+            Ok(n) => n,
+            Err(e) => {
+                eprintln!("Failed to read from socket: {}", e);
+                return Err(e);
+            },
+        };
+
+        if let Err(e) = tls_stream.write_all(&buf[0..n]).await {
+            eprintln!("Failed to write to socket: {}", e);
+            return Err(e);
+        }
+    }
+}
+
+fn main() -> io::Result<()> {
     let conf = conf::Conf::get();
 
     println!();
@@ -24,36 +57,40 @@ async fn main() -> Result<()> {
     })
     .expect("Error initializing SIGINT handler");
 
-    // Placeholder listener - will be removed ASAP.
-    let mut listener =
-        TcpListener::bind(&format!("{}:{}", conf.ip, conf.port)).await?;
-    loop {
-        let (mut socket, _) = listener.accept().await?;
+    let server_conf = conf.server_config()?;
+    let bind_addr = &format!("{}:{}", conf.ip, conf.port)[..];
 
-        tokio::spawn(async move {
-            let mut buf: [u8; 1024] = [0; 1024];
+    let acceptor = TlsAcceptor::from(Arc::new(server_conf));
 
-            loop {
-                let n = match socket.read(&mut buf).await {
-                    Ok(n) if n == 0 => return,
-                    Ok(n) => n,
+    task::block_on(async {
+        let bind_addr = bind_addr.to_socket_addrs().await;
+        let bind_addr = bind_addr.unwrap().next().unwrap();
+        let listener = TcpListener::bind(&bind_addr)
+            .await
+            .expect(&format!("Could not bind to {}:{}", conf.ip, conf.port));
+        let mut incoming = listener.incoming();
+
+        while let Some(stream) = incoming.next().await {
+            let acceptor = acceptor.clone();
+            let mut stream = stream.unwrap();
+
+            task::spawn(async move {
+                let result = echo(&acceptor, &mut stream).await;
+                match result {
+                    Ok(_) => {},
                     Err(e) => {
-                        eprintln!("failed to read from socket; err = {:?}", e);
-                        return;
+                        eprintln!("{:?}", e);
                     },
-                };
-
-                if let Err(e) = socket.write_all(&buf[0..n]).await {
-                    eprintln!("failed to write to socket; err = {:?}", e);
-                    return;
                 }
-            }
-        });
-    }
+            });
+        }
+    });
+
+    Ok(())
 }
 
 #[test]
 fn it_works() {
     // lol
-    unimplemented!("TODO: Implement this");
+    assert!(true);
 }
