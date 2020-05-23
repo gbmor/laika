@@ -13,6 +13,7 @@ pub struct Conf {
     pub vers: String,
     pub ip: String,
     pub port: u16,
+    pub logfile: String,
     pub rootdir: String,
     pub tls_cert: String,
     pub tls_key: String,
@@ -43,10 +44,18 @@ impl Conf {
                     .takes_value(true),
             )
             .arg(
+                Arg::with_name("logfile")
+                    .short("l")
+                    .long("logfile")
+                    .value_name("Path")
+                    .help("Path to log file")
+                    .takes_value(true),
+            )
+            .arg(
                 Arg::with_name("rootdir")
                     .short("r")
                     .long("rootdir")
-                    .value_name("Root Directory")
+                    .value_name("Path")
                     .help("Directory where gemini files reside")
                     .takes_value(true),
             )
@@ -54,7 +63,7 @@ impl Conf {
                 Arg::with_name("cert")
                     .short("c")
                     .long("cert")
-                    .value_name("TLS Certificate")
+                    .value_name("Path")
                     .help("Path to TLS certificate file")
                     .takes_value(true),
             )
@@ -62,7 +71,7 @@ impl Conf {
                 Arg::with_name("key")
                     .short("k")
                     .long("key")
-                    .value_name("TLS Private Key")
+                    .value_name("Path")
                     .help("Path to TLS private key file")
                     .takes_value(true),
             )
@@ -76,6 +85,10 @@ impl Conf {
                 .unwrap_or("1965")
                 .parse()
                 .unwrap_or_else(|_| 1965),
+            logfile: matches
+                .value_of("logfile")
+                .unwrap_or("/tmp/laika.log")
+                .into(),
             rootdir: matches
                 .value_of("rootdir")
                 .unwrap_or("/var/gemini")

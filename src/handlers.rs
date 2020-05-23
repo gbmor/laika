@@ -6,7 +6,7 @@ pub async fn echo(
     tcp_stream: &mut TcpStream,
 ) -> io::Result<()> {
     let addr = tcp_stream.peer_addr()?;
-    println!("Conn from {}", addr);
+    log::info!("Connection from {}", addr);
 
     let handshake = acceptor.accept(tcp_stream);
 
