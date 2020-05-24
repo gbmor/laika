@@ -4,7 +4,7 @@ use url::Url;
 
 use std::{fs, str};
 
-use crate::conf;
+use crate::{conf, response};
 
 pub async fn entrance(
     acceptor: &TlsAcceptor,
@@ -79,6 +79,8 @@ async fn route(
         serve_index(tls_stream, &conf.rootdir, "").await?;
     }
 
+    serve_from_root(tls_stream, &conf.rootdir, path).await?;
+
     Ok(())
 }
 
@@ -94,6 +96,44 @@ async fn serve_index(
         .write_all(b"20 text/gemini; charset=utf-8\r\n")
         .await?;
     tls_stream.write_all(&idx_b).await?;
+
+    Ok(())
+}
+
+async fn serve_from_root(
+    tls_stream: &mut TlsStream<&mut TcpStream>,
+    rootdir: &str,
+    path: &str,
+) -> io::Result<()> {
+    let path = format!("{}{}", rootdir, path);
+    let fi = match fs::read(&path) {
+        Ok(f) => f,
+        Err(e) => {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                let msg = format!("{} NOT FOUND\r\n", response::NOT_FOUND);
+                log::error!(
+                    "REQ :: {} NOT FOUND :: {}",
+                    response::NOT_FOUND,
+                    e
+                );
+                tls_stream.write_all(msg.as_bytes()).await?;
+                return Ok(());
+            }
+            let msg = format!(
+                "{} TEMPORARY FAILURE\r\n",
+                response::TEMPORARY_FAILURE
+            );
+            log::error!(
+                "REQ :: {} TEMPORARY FAILURE :: {}",
+                response::TEMPORARY_FAILURE,
+                e
+            );
+            tls_stream.write_all(msg.as_bytes()).await?;
+            return Ok(());
+        },
+    };
+
+    tls_stream.write_all(&fi).await?;
 
     Ok(())
 }
