@@ -1,12 +1,15 @@
 use async_std::{io, net::TcpStream, prelude::*};
-use async_tls::TlsAcceptor;
+use async_tls::{server::TlsStream, TlsAcceptor};
 use url::Url;
 
-use std::str;
+use std::{fs, str};
+
+use crate::conf;
 
 pub async fn entrance(
     acceptor: &TlsAcceptor,
     tcp_stream: &mut TcpStream,
+    conf: &conf::Conf,
 ) -> io::Result<()> {
     let addr = tcp_stream.peer_addr()?;
     log::info!("Connection from {}", addr);
@@ -38,7 +41,7 @@ pub async fn entrance(
         },
     };
 
-    let _url = match Url::parse(req_str) {
+    let url = match Url::parse(req_str) {
         Ok(url) => url,
         Err(e) => {
             log::error!(
@@ -50,6 +53,47 @@ pub async fn entrance(
         },
     };
 
-    tls_stream.write_all(req_str.as_bytes()).await?;
+    if url.scheme() != "gemini" {
+        tls_stream
+            .write_all(b"59 BAD REQUEST: Invalid Scheme\r\n")
+            .await?;
+        log::error!("REQ from {} :: Invalid scheme: {}", addr, url.scheme());
+        return Ok(());
+    }
+
+    if let Err(e) = route(&mut tls_stream, &url, &conf).await {
+        log::error!("REQ from {} :: Routing error: {}", addr, e);
+    };
+
+    Ok(())
+}
+
+async fn route(
+    tls_stream: &mut TlsStream<&mut TcpStream>,
+    req_url: &Url,
+    conf: &conf::Conf,
+) -> io::Result<()> {
+    let path = req_url.path();
+
+    if path == "/" || path == "/index.gmi" || path == "" {
+        serve_index(tls_stream, &conf.rootdir, "").await?;
+    }
+
+    Ok(())
+}
+
+async fn serve_index(
+    tls_stream: &mut TlsStream<&mut TcpStream>,
+    rootdir: &str,
+    prefix: &str,
+) -> io::Result<()> {
+    let idx_path = format!("{}{}/index.gmi", rootdir, prefix);
+    let idx_b = fs::read(&idx_path)?;
+
+    tls_stream
+        .write_all(b"20 text/gemini; charset=utf-8\r\n")
+        .await?;
+    tls_stream.write_all(&idx_b).await?;
+
     Ok(())
 }

@@ -46,9 +46,11 @@ fn main() -> io::Result<()> {
         while let Some(stream) = incoming.next().await {
             let acceptor = acceptor.clone();
             let mut stream = stream.unwrap();
+            let conf = conf.clone();
 
             task::spawn(async move {
-                let result = handlers::entrance(&acceptor, &mut stream).await;
+                let result =
+                    handlers::entrance(&acceptor, &mut stream, &conf).await;
                 match result {
                     Ok(_) => {},
                     Err(e) => {

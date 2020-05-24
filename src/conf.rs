@@ -8,7 +8,7 @@ use rustls::{
 
 use std::{fs::File, io::BufReader, path::Path, sync::Arc};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Conf {
     pub vers: String,
     pub ip: String,
