@@ -1,9 +1,8 @@
 use async_std::{io, net::TcpStream, prelude::*};
 use async_tls::TlsAcceptor;
+use url::Url;
 
 use std::str;
-
-use crate::response;
 
 pub async fn entrance(
     acceptor: &TlsAcceptor,
@@ -27,23 +26,7 @@ pub async fn entrance(
         },
     };
 
-    if !req_buf.ends_with(b"\r\n") {
-        let msg = format!(
-            "{} Bad Request: Does not end in CRLF\r\n",
-            response::BAD_REQUEST
-        );
-        log::error!(
-            "REQ from {} :: {} Bad Request :: Does not end in CRLF",
-            addr,
-            response::BAD_REQUEST
-        );
-        if let Err(e) = tls_stream.write_all(&msg.as_bytes()).await {
-            log::error!("REQ from {} :: {}", addr, e);
-        }
-        return Ok(());
-    }
-
-    let req_str = match str::from_utf8(&req_buf[..n - 2]) {
+    let req_str = match str::from_utf8(&req_buf[..n - 1]) {
         Ok(s) => s,
         Err(e) => {
             log::error!(
@@ -52,6 +35,18 @@ pub async fn entrance(
                 e
             );
             "/ \r\n"
+        },
+    };
+
+    let _url = match Url::parse(req_str) {
+        Ok(url) => url,
+        Err(e) => {
+            log::error!(
+                "REQ from {} :: Unable to parse request as URL: {}",
+                addr,
+                e
+            );
+            return Ok(());
         },
     };
 
