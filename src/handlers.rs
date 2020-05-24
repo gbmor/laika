@@ -27,7 +27,23 @@ pub async fn entrance(
         },
     };
 
-    let req_str = match str::from_utf8(&req_buf[..n]) {
+    if !req_buf.ends_with(b"\r\n") {
+        let msg = format!(
+            "{} Bad Request: Does not end in CRLF\r\n",
+            response::BAD_REQUEST
+        );
+        log::error!(
+            "REQ from {} :: {} Bad Request :: Does not end in CRLF",
+            addr,
+            response::BAD_REQUEST
+        );
+        if let Err(e) = tls_stream.write_all(&msg.as_bytes()).await {
+            log::error!("REQ from {} :: {}", addr, e);
+        }
+        return Ok(());
+    }
+
+    let req_str = match str::from_utf8(&req_buf[..n - 2]) {
         Ok(s) => s,
         Err(e) => {
             log::error!(
@@ -38,23 +54,6 @@ pub async fn entrance(
             "/ \r\n"
         },
     };
-
-    if !req_buf.ends_with(b"\r\n") {
-        let msg = format!(
-            "{} Bad Request: Does not end in CRLF\r\n",
-            response::BAD_REQUEST
-        );
-        log::error!(
-            "REQ from {} :: {} Bad Request :: Does not end in CRLF :: {}",
-            addr,
-            response::BAD_REQUEST,
-            req_str
-        );
-        if let Err(e) = tls_stream.write_all(&msg.as_bytes()).await {
-            log::error!("REQ from {} :: {}", addr, e);
-        }
-        return Ok(());
-    }
 
     tls_stream.write_all(req_str.as_bytes()).await?;
     Ok(())
