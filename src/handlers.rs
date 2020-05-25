@@ -44,6 +44,17 @@ pub async fn entrance(
         },
     };
 
+    if req_str.contains("..") {
+        log::warn!(
+            "REQ from {} :: Directory traversal attempted: {}",
+            addr,
+            req_str
+        );
+        let msg = format!("{} BAD REQUEST\r\n", response::BAD_REQUEST);
+        tls_stream.write_all(msg.as_bytes()).await?;
+        return Ok(());
+    }
+
     let url = match Url::parse(req_str) {
         Ok(url) => url,
         Err(e) => {
@@ -152,9 +163,7 @@ async fn serve_from_root(
     tls_stream.write_all(&fi).await?;
 
     if mime == "text/gemini; charset=utf-8" {
-        tls_stream
-            .write_all(response::FOOTER_TEXT.as_bytes())
-            .await?;
+        tls_stream.write_all(response::footer_bytes()).await?;
     }
 
     Ok(())
