@@ -134,7 +134,8 @@ async fn serve_from_root(
         },
     };
 
-    let header = format!("{} text/gemini; charset=utf-8", response::SUCCESS);
+    let header =
+        format!("{} text/gemini; charset=utf-8\r\n", response::SUCCESS);
     tls_stream.write_all(header.as_bytes()).await?;
     tls_stream.write_all(&fi).await?;
 
