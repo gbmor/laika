@@ -150,9 +150,12 @@ async fn serve_from_root(
     let header = format!("{} {}\r\n", response::SUCCESS, mime);
     tls_stream.write_all(header.as_bytes()).await?;
     tls_stream.write_all(&fi).await?;
-    tls_stream
-        .write_all(response::FOOTER_TEXT.as_bytes())
-        .await?;
+
+    if mime == "text/gemini; charset=utf-8" {
+        tls_stream
+            .write_all(response::FOOTER_TEXT.as_bytes())
+            .await?;
+    }
 
     Ok(())
 }
