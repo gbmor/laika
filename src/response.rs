@@ -20,3 +20,6 @@ pub const AUTHORISED_CERT_REQUIRED: usize = 62;
 pub const CERT_NOT_ACCEPTED: usize = 63;
 pub const FUTURE_CERT_REJECTED: usize = 64;
 pub const EXPIRED_CERT_REJECTED: usize = 65;
+
+pub const FOOTER_TEXT: &str =
+    "\n\n~~~~ served by laika ~~~~~~~~~\nhttps://github.com/gbmor/laika\n\n";

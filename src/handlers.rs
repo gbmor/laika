@@ -102,9 +102,9 @@ async fn serve_from_root(
     };
 
     let fullpath = if fs::metadata(&fixedpath)?.file_type().is_dir() {
-        format!("{}{}/index.gmi", rootdir, fixedpath)
+        format!("{}/index.gmi", fixedpath)
     } else {
-        format!("{}{}", rootdir, fixedpath)
+        format!("{}", fixedpath)
     };
 
     let fi = match fs::read(&fullpath) {
@@ -138,6 +138,9 @@ async fn serve_from_root(
         format!("{} text/gemini; charset=utf-8\r\n", response::SUCCESS);
     tls_stream.write_all(header.as_bytes()).await?;
     tls_stream.write_all(&fi).await?;
+    tls_stream
+        .write_all(response::FOOTER_TEXT.as_bytes())
+        .await?;
 
     Ok(())
 }
