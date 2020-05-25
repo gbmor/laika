@@ -61,6 +61,8 @@ pub async fn entrance(
         return Ok(());
     }
 
+    log::info!("REQ from {} :: {}", addr, url);
+
     if let Err(e) = route(&mut tls_stream, &url, &conf).await {
         log::error!("REQ from {} :: Routing error: {}", addr, e);
     };
@@ -75,27 +77,7 @@ async fn route(
 ) -> io::Result<()> {
     let path = req_url.path();
 
-    if path == "/" || path == "/index.gmi" || path == "" {
-        serve_index(tls_stream, &conf.rootdir, "").await?;
-    }
-
     serve_from_root(tls_stream, &conf.rootdir, path).await?;
-
-    Ok(())
-}
-
-async fn serve_index(
-    tls_stream: &mut TlsStream<&mut TcpStream>,
-    rootdir: &str,
-    prefix: &str,
-) -> io::Result<()> {
-    let idx_path = format!("{}{}/index.gmi", rootdir, prefix);
-    let idx_b = fs::read(&idx_path)?;
-
-    tls_stream
-        .write_all(b"20 text/gemini; charset=utf-8\r\n")
-        .await?;
-    tls_stream.write_all(&idx_b).await?;
 
     Ok(())
 }
@@ -105,8 +87,21 @@ async fn serve_from_root(
     rootdir: &str,
     path: &str,
 ) -> io::Result<()> {
-    let path = format!("{}{}", rootdir, path);
-    let fi = match fs::read(&path) {
+    let fixedpath;
+
+    if path.ends_with("/") || path == "" {
+        fixedpath = format!("{}/index.gmi", path);
+    } else {
+        fixedpath = path.to_string();
+    }
+
+    let mut fullpath = format!("{}{}", rootdir, fixedpath);
+
+    if fs::metadata(&fullpath)?.file_type().is_dir() {
+        fullpath = format!("{}/index.gmi", fullpath);
+    }
+
+    let fi = match fs::read(&fullpath) {
         Ok(f) => f,
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
@@ -133,6 +128,9 @@ async fn serve_from_root(
         },
     };
 
+    tls_stream
+        .write_all(b"20 text/gemini; charset=utf-8\r\n")
+        .await?;
     tls_stream.write_all(&fi).await?;
 
     Ok(())
