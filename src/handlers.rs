@@ -1,5 +1,6 @@
 use async_std::{io, net::TcpStream, prelude::*};
 use async_tls::{server::TlsStream, TlsAcceptor};
+use tree_magic;
 use url::Url;
 
 use std::{fs, str};
@@ -134,8 +135,19 @@ async fn serve_from_root(
         },
     };
 
-    let header =
-        format!("{} text/gemini; charset=utf-8\r\n", response::SUCCESS);
+    let mime = if fullpath.ends_with(".gmi") {
+        "text/gemini; charset=utf-8".to_string()
+    } else {
+        tree_magic::from_u8(&fi)
+    };
+
+    let mime = if mime.contains("text/") && !mime.contains("; charset=utf-8") {
+        format!("{}; charset=utf-8", mime)
+    } else {
+        mime
+    };
+
+    let header = format!("{} {}\r\n", response::SUCCESS, mime);
     tls_stream.write_all(header.as_bytes()).await?;
     tls_stream.write_all(&fi).await?;
     tls_stream
