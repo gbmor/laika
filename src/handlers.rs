@@ -6,6 +6,8 @@ use std::{fs, str};
 
 use crate::{conf, response};
 
+// This is the initial handler for each new connection.
+// Read the request, validate it, and pass it off.
 pub async fn entrance(
     acceptor: &TlsAcceptor,
     tcp_stream: &mut TcpStream,
@@ -54,9 +56,11 @@ pub async fn entrance(
     };
 
     if url.scheme() != "gemini" {
-        tls_stream
-            .write_all(b"59 BAD REQUEST: Invalid Scheme\r\n")
-            .await?;
+        let msg = format!(
+            "{} BAD REQUEST: Invalid Scheme\r\n",
+            response::BAD_REQUEST
+        );
+        tls_stream.write_all(msg.as_bytes()).await?;
         log::error!("REQ from {} :: Invalid scheme: {}", addr, url.scheme());
         return Ok(());
     }
@@ -70,6 +74,7 @@ pub async fn entrance(
     Ok(())
 }
 
+// Determines the next hop after the entrance handler.
 async fn route(
     tls_stream: &mut TlsStream<&mut TcpStream>,
     req_url: &Url,
@@ -82,24 +87,25 @@ async fn route(
     Ok(())
 }
 
+// Serves pages from the main gemini root directory.
 async fn serve_from_root(
     tls_stream: &mut TlsStream<&mut TcpStream>,
     rootdir: &str,
     path: &str,
 ) -> io::Result<()> {
-    let fixedpath;
-
-    if path.ends_with("/") || path == "" {
-        fixedpath = format!("{}/index.gmi", path);
+    let fixedpath = if path == "" {
+        format!("{}/index.gmi", rootdir)
+    } else if path.ends_with("/") {
+        format!("{}{}index.gmi", rootdir, path)
     } else {
-        fixedpath = path.to_string();
-    }
+        format!("{}{}", rootdir, path)
+    };
 
-    let mut fullpath = format!("{}{}", rootdir, fixedpath);
-
-    if fs::metadata(&fullpath)?.file_type().is_dir() {
-        fullpath = format!("{}/index.gmi", fullpath);
-    }
+    let fullpath = if fs::metadata(&fixedpath)?.file_type().is_dir() {
+        format!("{}{}/index.gmi", rootdir, fixedpath)
+    } else {
+        format!("{}{}", rootdir, fixedpath)
+    };
 
     let fi = match fs::read(&fullpath) {
         Ok(f) => f,
@@ -128,9 +134,8 @@ async fn serve_from_root(
         },
     };
 
-    tls_stream
-        .write_all(b"20 text/gemini; charset=utf-8\r\n")
-        .await?;
+    let header = format!("{} text/gemini; charset=utf-8", response::SUCCESS);
+    tls_stream.write_all(header.as_bytes()).await?;
     tls_stream.write_all(&fi).await?;
 
     Ok(())
