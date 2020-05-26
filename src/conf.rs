@@ -166,9 +166,11 @@ mod tests {
         let conf = Conf::get();
         assert_eq!(conf.ip, "0.0.0.0");
         assert_eq!(conf.port, 1965);
-        assert_eq!(conf.logfile, "/tmp/laika.log");
+        assert_eq!(conf.logfile, "/var/log/laika.log");
         assert_eq!(conf.rootdir, "/var/gemini");
         assert_eq!(conf.tls_cert, "/etc/ssl/laika.pem");
         assert_eq!(conf.tls_key, "/etc/ssl/private/laika.key");
+        assert_eq!(conf.user, "laika");
+        assert_eq!(conf.group, "laika");
     }
 }
