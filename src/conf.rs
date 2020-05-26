@@ -12,11 +12,13 @@ use std::{fs::File, io::BufReader, path::Path, sync::Arc};
 pub struct Conf {
     pub vers: String,
     pub ip: String,
-    pub port: u16,
     pub logfile: String,
+    pub port: u16,
     pub rootdir: String,
     pub tls_cert: String,
     pub tls_key: String,
+    pub user: String,
+    pub group: String,
 }
 
 impl Conf {
@@ -75,6 +77,22 @@ impl Conf {
                     .help("Path to TLS private key file")
                     .takes_value(true),
             )
+            .arg(
+                Arg::with_name("user")
+                    .short("u")
+                    .long("user")
+                    .value_name("User Name")
+                    .help("User laika should run as")
+                    .takes_value(true),
+            )
+            .arg(
+                Arg::with_name("group")
+                    .short("g")
+                    .long("group")
+                    .value_name("Group Name")
+                    .help("Group laika should run as")
+                    .takes_value(true),
+            )
             .get_matches();
 
         Conf {
@@ -101,6 +119,8 @@ impl Conf {
                 .value_of("key")
                 .unwrap_or("/etc/ssl/private/laika.key")
                 .into(),
+            user: matches.value_of("user").unwrap_or("_laika").into(),
+            group: matches.value_of("group").unwrap_or("_laika").into(),
         }
     }
 

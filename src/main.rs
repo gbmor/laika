@@ -23,6 +23,23 @@ fn main() -> io::Result<()> {
 
     log::info!("laika starting ...");
 
+    // The tls acceptor needs to be created before dropping privileges
+    // in order to read the TLS key (assuming it's only readable by root)
+    let acceptor = conf.tls_acceptor()?;
+
+    if let Err(e) = privdrop::PrivDrop::default()
+        .user(&conf.user)
+        .group(&conf.group)
+        .apply()
+    {
+        log::warn!(
+            "Couldn't drop privileges to user {}, group {}: {}",
+            &conf.user,
+            &conf.group,
+            e
+        );
+    }
+
     // Handle sigint
     ctrlc::set_handler(move || {
         log::warn!("Interrupt caught ...");
@@ -31,7 +48,6 @@ fn main() -> io::Result<()> {
     .expect("Error initializing SIGINT handler");
 
     let bind_addr_string = format!("{}:{}", conf.ip, conf.port);
-    let acceptor = conf.tls_acceptor()?;
 
     task::block_on(async {
         let bind_addr = bind_addr_string.to_socket_addrs().await;

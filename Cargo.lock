@@ -210,7 +210,7 @@ version = "3.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a4ba686dff9fa4c1c9636ce1010b0cf98ceb421361b0bb3d6faeec43bd217a7"
 dependencies = [
- "nix",
+ "nix 0.17.0",
  "winapi",
 ]
 
@@ -400,6 +400,7 @@ dependencies = [
  "clap",
  "ctrlc",
  "log",
+ "privdrop",
  "rustls",
  "simplelog",
  "tree_magic",
@@ -470,6 +471,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4fc2c02a7e374099d4ee95a193111f72d2110197fe200272371758f6c3643d8"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "nix"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd0eaf8df8bab402257e0a5c17a254e4cc1f72a93588a1ddfb5d356c801aa7cb"
+dependencies = [
+ "bitflags",
+ "cc",
+ "cfg-if",
+ "libc",
+ "void",
 ]
 
 [[package]]
@@ -614,6 +628,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "privdrop"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "939fa7cbfef9c15c65cf2fb3ed57f3f2a14dca1757a556aa1ba4a7f998b2b479"
+dependencies = [
+ "libc",
+ "nix 0.16.1",
+]
+
+[[package]]
 name = "proc-macro-hack"
 version = "0.5.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -738,7 +762,7 @@ dependencies = [
  "crossbeam",
  "futures-io",
  "futures-util",
- "nix",
+ "nix 0.17.0",
  "once_cell",
  "piper",
  "scoped-tls-hkt",
