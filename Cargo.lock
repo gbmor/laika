@@ -81,6 +81,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
+name = "boxfnonce"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5988cb1d626264ac94100be357308f29ff7cbdd3b36bda27f450a4ee3f713426"
+
+[[package]]
 name = "bumpalo"
 version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -212,6 +218,16 @@ checksum = "7a4ba686dff9fa4c1c9636ce1010b0cf98ceb421361b0bb3d6faeec43bd217a7"
 dependencies = [
  "nix 0.17.0",
  "winapi",
+]
+
+[[package]]
+name = "daemonize"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70c24513e34f53b640819f0ac9f705b673fcf4006d7aab8778bee72ebfc89815"
+dependencies = [
+ "boxfnonce",
+ "libc",
 ]
 
 [[package]]
@@ -399,6 +415,7 @@ dependencies = [
  "async-tls",
  "clap",
  "ctrlc",
+ "daemonize",
  "log",
  "privdrop",
  "rustls",

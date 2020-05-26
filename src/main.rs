@@ -27,19 +27,6 @@ fn main() -> io::Result<()> {
     // in order to read the TLS key (assuming it's only readable by root)
     let acceptor = conf.tls_acceptor()?;
 
-    if let Err(e) = privdrop::PrivDrop::default()
-        .user(&conf.user)
-        .group(&conf.group)
-        .apply()
-    {
-        log::warn!(
-            "Couldn't drop privileges to user {}, group {}: {}",
-            &conf.user,
-            &conf.group,
-            e
-        );
-    }
-
     // Handle sigint
     ctrlc::set_handler(move || {
         log::warn!("Interrupt caught ...");
@@ -47,15 +34,19 @@ fn main() -> io::Result<()> {
     })
     .expect("Error initializing SIGINT handler");
 
-    let bind_addr_string = format!("{}:{}", conf.ip, conf.port);
-
     task::block_on(async {
+        let bind_addr_string = format!("{}:{}", conf.ip, conf.port);
         let bind_addr = bind_addr_string.to_socket_addrs().await;
         let bind_addr = bind_addr.unwrap().next().unwrap();
         let listener = TcpListener::bind(&bind_addr)
             .await
             .expect(&format!("Could not bind to {}:{}", conf.ip, conf.port));
+
         log::info!("Bound to {}", bind_addr_string);
+
+        // Now we drop privileges. The default port is not a privileged port,
+        // but we shouldn't fail if the user specifies a port <1024.
+        conf.drop_privs();
 
         let mut incoming = listener.incoming();
 
@@ -70,7 +61,7 @@ fn main() -> io::Result<()> {
                 match result {
                     Ok(_) => {},
                     Err(e) => {
-                        log::error!("{:?}", e);
+                        log::error!("{}", e);
                     },
                 }
             });

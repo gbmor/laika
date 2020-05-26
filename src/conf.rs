@@ -1,6 +1,7 @@
 use async_std::io;
 use async_tls::TlsAcceptor;
 use clap::{App, Arg};
+use daemonize::Daemonize;
 use rustls::{
     internal::pemfile::{certs, pkcs8_private_keys},
     Certificate, NoClientAuth, PrivateKey, ServerConfig,
@@ -17,6 +18,7 @@ pub struct Conf {
     pub rootdir: String,
     pub tls_cert: String,
     pub tls_key: String,
+    pub daemon: bool,
     pub user: String,
     pub group: String,
 }
@@ -78,6 +80,13 @@ impl Conf {
                     .takes_value(true),
             )
             .arg(
+                Arg::with_name("daemon")
+                    .short("d")
+                    .long("daemon")
+                    .help("If set, laika will run as a daemon")
+                    .takes_value(false),
+            )
+            .arg(
                 Arg::with_name("user")
                     .short("u")
                     .long("user")
@@ -121,6 +130,7 @@ impl Conf {
                 .into(),
             user: matches.value_of("user").unwrap_or("laika").into(),
             group: matches.value_of("group").unwrap_or("laika").into(),
+            daemon: matches.is_present("daemon"),
         }
     }
 
@@ -154,6 +164,38 @@ impl Conf {
     pub fn tls_acceptor(&self) -> io::Result<TlsAcceptor> {
         let server_config = self.server_config()?;
         Ok(TlsAcceptor::from(Arc::new(server_config)))
+    }
+
+    // Either drops privileges and daemonizes, or just drops privileges.
+    // Controlled by the `-d` flag. If either fails, exit(1).
+    pub fn drop_privs(&self) {
+        if self.daemon {
+            let daemon = Daemonize::new()
+                .user(self.user.as_ref())
+                .group(self.group.as_ref());
+
+            match daemon.start() {
+                Ok(_) => {},
+                Err(e) => {
+                    log::error!("Could not daemonize: {}", e);
+                    std::process::exit(1);
+                },
+            }
+        } else {
+            if let Err(e) = privdrop::PrivDrop::default()
+                .user(&self.user)
+                .group(&self.group)
+                .apply()
+            {
+                log::error!(
+                    "Couldn't drop privileges to user {}, group {}: {}",
+                    self.user,
+                    self.group,
+                    e
+                );
+                std::process::exit(1);
+            }
+        }
     }
 }
 
