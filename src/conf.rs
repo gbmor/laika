@@ -119,8 +119,8 @@ impl Conf {
                 .value_of("key")
                 .unwrap_or("/etc/ssl/private/laika.key")
                 .into(),
-            user: matches.value_of("user").unwrap_or("_laika").into(),
-            group: matches.value_of("group").unwrap_or("_laika").into(),
+            user: matches.value_of("user").unwrap_or("laika").into(),
+            group: matches.value_of("group").unwrap_or("laika").into(),
         }
     }
 
