@@ -5,7 +5,8 @@
 Async Gemini protocol server, using `async-std`, `async-tls`, and `rustls`.
 
 This thing isn't finished yet, so there are no tagged releases. If you want to
-build from master, beware: **here be dragons**.
+build from master, beware: **here be dragons**. I also need to do some cleanup
+and reorganization.
 
 * Drops privs (by default, to `laika`)
 * Serves static content
