@@ -105,7 +105,7 @@ impl Conf {
                 .unwrap_or_else(|_| 1965),
             logfile: matches
                 .value_of("logfile")
-                .unwrap_or("/tmp/laika.log")
+                .unwrap_or("/var/log/laika.log")
                 .into(),
             rootdir: matches
                 .value_of("rootdir")
