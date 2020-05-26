@@ -113,7 +113,34 @@ async fn serve_from_root(
         format!("{}{}", rootdir, path)
     };
 
-    let fullpath = if fs::metadata(&fixedpath)?.file_type().is_dir() {
+    let metadata = match fs::metadata(&fixedpath) {
+        Ok(m) => m,
+        Err(e) => {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                let msg = format!("{} NOT FOUND\r\n", response::NOT_FOUND);
+                log::error!(
+                    "REQ :: {} NOT FOUND :: {}",
+                    response::NOT_FOUND,
+                    e
+                );
+                tls_stream.write_all(msg.as_bytes()).await?;
+                return Ok(());
+            }
+            let msg = format!(
+                "{} TEMPORARY FAILURE\r\n",
+                response::TEMPORARY_FAILURE
+            );
+            log::error!(
+                "REQ :: {} TEMPORARY FAILURE :: {}",
+                response::TEMPORARY_FAILURE,
+                e
+            );
+            tls_stream.write_all(msg.as_bytes()).await?;
+            return Ok(());
+        },
+    };
+
+    let fullpath = if metadata.file_type().is_dir() {
         format!("{}/index.gmi", fixedpath)
     } else {
         format!("{}", fixedpath)
