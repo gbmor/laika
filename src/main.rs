@@ -6,6 +6,7 @@ use async_std::{
 };
 
 mod conf;
+mod files;
 mod handlers;
 mod logging;
 

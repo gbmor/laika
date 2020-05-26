@@ -1,11 +1,10 @@
 use async_std::{io, net::TcpStream, prelude::*};
 use async_tls::{server::TlsStream, TlsAcceptor};
-use tree_magic;
 use url::Url;
 
-use std::{fs, str};
+use std::str;
 
-use crate::{conf, response};
+use crate::{conf, files, response};
 
 // This is the initial handler for each new connection.
 // Read the request, validate it, and pass it off.
@@ -113,76 +112,9 @@ async fn serve_from_root(
         format!("{}{}", rootdir, path)
     };
 
-    let metadata = match fs::metadata(&fixedpath) {
-        Ok(m) => m,
-        Err(e) => {
-            if e.kind() == std::io::ErrorKind::NotFound {
-                let msg = format!("{} NOT FOUND\r\n", response::NOT_FOUND);
-                log::error!(
-                    "REQ :: {} NOT FOUND :: {}",
-                    response::NOT_FOUND,
-                    e
-                );
-                tls_stream.write_all(msg.as_bytes()).await?;
-                return Ok(());
-            }
-            let msg = format!(
-                "{} TEMPORARY FAILURE\r\n",
-                response::TEMPORARY_FAILURE
-            );
-            log::error!(
-                "REQ :: {} TEMPORARY FAILURE :: {}",
-                response::TEMPORARY_FAILURE,
-                e
-            );
-            tls_stream.write_all(msg.as_bytes()).await?;
-            return Ok(());
-        },
-    };
-
-    let fullpath = if metadata.file_type().is_dir() {
-        format!("{}/index.gmi", fixedpath)
-    } else {
-        format!("{}", fixedpath)
-    };
-
-    let fi = match fs::read(&fullpath) {
-        Ok(f) => f,
-        Err(e) => {
-            if e.kind() == std::io::ErrorKind::NotFound {
-                let msg = format!("{} NOT FOUND\r\n", response::NOT_FOUND);
-                log::error!(
-                    "REQ :: {} NOT FOUND :: {}",
-                    response::NOT_FOUND,
-                    e
-                );
-                tls_stream.write_all(msg.as_bytes()).await?;
-                return Ok(());
-            }
-            let msg = format!(
-                "{} TEMPORARY FAILURE\r\n",
-                response::TEMPORARY_FAILURE
-            );
-            log::error!(
-                "REQ :: {} TEMPORARY FAILURE :: {}",
-                response::TEMPORARY_FAILURE,
-                e
-            );
-            tls_stream.write_all(msg.as_bytes()).await?;
-            return Ok(());
-        },
-    };
-
-    let mime = if fullpath.ends_with(".gmi") {
-        "text/gemini; charset=utf-8".to_string()
-    } else {
-        tree_magic::from_u8(&fi)
-    };
-
-    let mime = if mime.contains("text/") && !mime.contains("; charset=utf-8") {
-        format!("{}; charset=utf-8", mime)
-    } else {
-        mime
+    let (fi, mime) = match files::parse(&fixedpath, tls_stream).await {
+        Ok((fi, mime)) => (fi, mime),
+        Err(_) => return Ok(()),
     };
 
     let header = format!("{} {}\r\n", response::SUCCESS, mime);
