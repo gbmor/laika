@@ -1,0 +1,11 @@
+image: alpine/edge
+packages:
+  - rust
+  - cargo
+sources:
+  - https://git.sr.ht/~gbmor/laika
+tasks:
+  - build: |
+      cd laika
+      cargo test
+      cargo build
