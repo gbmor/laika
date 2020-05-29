@@ -1,6 +1,6 @@
 # laika
 
-[![Build Status](https://travis-ci.com/gbmor/laika.svg?branch=master)](https://travis-ci.com/gbmor/laika) [![codecov](https://codecov.io/gh/gbmor/laika/branch/master/graph/badge.svg)](https://codecov.io/gh/gbmor/laika)
+[![builds.sr.ht status](https://builds.sr.ht/~gbmor/laika.svg)](https://builds.sr.ht/~gbmor/laika?) [![Build Status](https://travis-ci.com/gbmor/laika.svg?branch=master)](https://travis-ci.com/gbmor/laika)
 
 Async Gemini protocol server, using `async-std`, `async-tls`, and `rustls`.
 
@@ -18,3 +18,11 @@ I will be implementing the following soon:
 * User directories (`~/public_gemini`)
 * CGI (FastCGI? SCGI? CGI?)
 * `10 INPUT` responses and replies
+
+### Development
+
+I'm primarily using [sr.ht/~gbmor/laika](https://sr.ht/~gbmor/laika) for development,
+but the tree will be mirrored to [github.com/gbmor/laika](https://github.com/gbmor/laika).
+
+* Send patches to: [~gbmor/laika@lists.sr.ht](mailto:~gbmor/laika@lists.sr.ht) 
+* Bug tracker: [https://todo.sr.ht/~gbmor/laika](https://todo.sr.ht/~gbmor/laika)
