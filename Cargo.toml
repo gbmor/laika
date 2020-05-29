@@ -2,7 +2,7 @@
 name = "laika"
 version = "0.1.0"
 authors = ["Ben Morrison <ben@gbmor.dev>"]
-license = "MIT OR Apache-2.0"
+license = "MIT"
 edition = "2018"
 
 [dependencies]
