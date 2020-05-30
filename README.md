@@ -18,6 +18,7 @@ I will be implementing the following soon:
 * User directories (`~/public_gemini`)
 * CGI (FastCGI? SCGI? CGI?)
 * `10 INPUT` responses and replies
+* Client cert verification
 
 ### Development
 
