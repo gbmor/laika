@@ -28,7 +28,7 @@ pub async fn entrance(
                 e
             );
             return Err(e);
-        },
+        }
     };
 
     let req_str = match str::from_utf8(&req_buf[..n - 1]) {
@@ -40,7 +40,7 @@ pub async fn entrance(
                 e
             );
             "/ \r\n"
-        },
+        }
     };
 
     if req_str.contains("..") {
@@ -49,7 +49,7 @@ pub async fn entrance(
             addr,
             req_str
         );
-        let msg = format!("{} BAD REQUEST\r\n", response::BAD_REQUEST);
+        let msg = format!("{} BAD REQUEST\r\n", response::Code::BadRequest);
         tls_stream.write_all(msg.as_bytes()).await?;
         return Ok(());
     }
@@ -63,13 +63,13 @@ pub async fn entrance(
                 e
             );
             return Ok(());
-        },
+        }
     };
 
     if url.scheme() != "gemini" {
         let msg = format!(
             "{} BAD REQUEST: Invalid Scheme\r\n",
-            response::BAD_REQUEST
+            response::Code::BadRequest
         );
         tls_stream.write_all(msg.as_bytes()).await?;
         log::error!("REQ from {} :: Invalid scheme: {}", addr, url.scheme());
@@ -117,7 +117,7 @@ async fn serve_from_root(
         Err(_) => return Ok(()),
     };
 
-    let header = format!("{} {}\r\n", response::SUCCESS, mime);
+    let header = format!("{} {}\r\n", response::Code::Success, mime);
     tls_stream.write_all(header.as_bytes()).await?;
     tls_stream.write_all(&fi).await?;
 

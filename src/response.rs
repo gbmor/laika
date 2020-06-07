@@ -1,25 +1,36 @@
+use std::fmt;
+
 // Response codes
-pub const INPUT: usize = 10;
-pub const SUCCESS: usize = 20;
-pub const SUCCESS_END_OF_CLIENT_CERT_SESSION: usize = 21;
-pub const REDIRECT_TEMPORARY: usize = 30;
-pub const REDIRECT_PERMANENT: usize = 31;
-pub const TEMPORARY_FAILURE: usize = 40;
-pub const SERVER_UNAVAILABLE: usize = 41;
-pub const CGI_ERROR: usize = 42;
-pub const PROXY_ERROR: usize = 43;
-pub const SLOW_DOWN: usize = 44;
-pub const PERMANENT_FAILURE: usize = 50;
-pub const NOT_FOUND: usize = 51;
-pub const GONE: usize = 52;
-pub const PROXY_REQUEST_REFUSED: usize = 53;
-pub const BAD_REQUEST: usize = 59;
-pub const CLIENT_CERT_REQUIRED: usize = 60;
-pub const TRANSIENT_CERT_REQUESTED: usize = 61;
-pub const AUTHORISED_CERT_REQUIRED: usize = 62;
-pub const CERT_NOT_ACCEPTED: usize = 63;
-pub const FUTURE_CERT_REJECTED: usize = 64;
-pub const EXPIRED_CERT_REJECTED: usize = 65;
+#[derive(Clone, Copy)]
+pub enum Code {
+    Input = 10,
+    Success = 20,
+    SuccessEndOfClientCertSession = 21,
+    RedirectTemporary = 30,
+    RedirectPermanent = 31,
+    TemporaryFailure = 40,
+    ServerUnavailable = 41,
+    CgiError = 42,
+    ProxyError = 43,
+    SlowDown = 44,
+    PermanentFailure = 50,
+    NotFound = 51,
+    Gone = 52,
+    ProxyRequestRefused = 53,
+    BadRequest = 59,
+    ClientCertRequired = 60,
+    TransientCertRequired = 61,
+    AuthorisedCertRequired = 62,
+    CertNotAccepted = 63,
+    FutureCertRejected = 64,
+    ExpiredCertRejected = 65,
+}
+
+impl fmt::Display for Code {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", *self as u8)
+    }
+}
 
 pub fn footer_bytes<'a>() -> &'a [u8] {
     "\n\n~~~~ served by laika ~~~~~~~~~\nhttps://github.com/gbmor/laika\n\n"

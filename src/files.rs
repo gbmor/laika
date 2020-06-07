@@ -16,10 +16,10 @@ pub async fn parse(
         Ok(m) => m,
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
-                let msg = format!("{} NOT FOUND\r\n", response::NOT_FOUND);
+                let msg = format!("{} NOT FOUND\r\n", response::Code::NotFound);
                 log::error!(
                     "REQ :: {} NOT FOUND :: {}",
-                    response::NOT_FOUND,
+                    response::Code::NotFound,
                     e
                 );
                 tls_stream.write_all(msg.as_bytes()).await?;
@@ -27,16 +27,16 @@ pub async fn parse(
             }
             let msg = format!(
                 "{} TEMPORARY FAILURE\r\n",
-                response::TEMPORARY_FAILURE
+                response::Code::TemporaryFailure
             );
             log::error!(
                 "REQ :: {} TEMPORARY FAILURE :: {}",
-                response::TEMPORARY_FAILURE,
+                response::Code::TemporaryFailure,
                 e
             );
             tls_stream.write_all(msg.as_bytes()).await?;
             return Err(e);
-        },
+        }
     };
 
     let fullpath = if metadata.file_type().is_dir() {
@@ -49,10 +49,10 @@ pub async fn parse(
         Ok(f) => f,
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
-                let msg = format!("{} NOT FOUND\r\n", response::NOT_FOUND);
+                let msg = format!("{} NOT FOUND\r\n", response::Code::NotFound);
                 log::error!(
                     "REQ :: {} NOT FOUND :: {}",
-                    response::NOT_FOUND,
+                    response::Code::NotFound,
                     e
                 );
                 tls_stream.write_all(msg.as_bytes()).await?;
@@ -60,16 +60,16 @@ pub async fn parse(
             }
             let msg = format!(
                 "{} TEMPORARY FAILURE\r\n",
-                response::TEMPORARY_FAILURE
+                response::Code::TemporaryFailure
             );
             log::error!(
                 "REQ :: {} TEMPORARY FAILURE :: {}",
-                response::TEMPORARY_FAILURE,
+                response::Code::TemporaryFailure,
                 e
             );
             tls_stream.write_all(msg.as_bytes()).await?;
             return Err(e);
-        },
+        }
     };
 
     let mime = if fullpath.ends_with(".gmi") {
