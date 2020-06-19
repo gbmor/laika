@@ -51,10 +51,15 @@ fn main() -> io::Result<()> {
 
         let mut incoming = listener.incoming();
 
-        while let Some(stream) = incoming.next().await {
-            let acceptor = acceptor.clone();
-            let mut stream = stream.unwrap();
+        while let Some(strm) = incoming.next().await {
+            let mut stream = if let Ok(s) = strm {
+                s
+            } else {
+                continue;
+            };
+
             let conf = conf.clone();
+            let acceptor = acceptor.clone();
 
             task::spawn(async move {
                 let result =
