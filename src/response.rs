@@ -26,12 +26,14 @@ pub enum Code {
     ExpiredCertRejected = 65,
 }
 
+// Allow printing the numeric value easily.
 impl fmt::Display for Code {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", *self as u8)
     }
 }
 
+// Appended to the bottom of .gmi files
 pub fn footer_bytes<'a>() -> &'a [u8] {
     "\n\n~~~~ served by laika ~~~~~~~~~\nhttps://github.com/gbmor/laika\n\n"
         .as_bytes()
