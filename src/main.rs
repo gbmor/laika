@@ -55,6 +55,7 @@ fn main() -> io::Result<()> {
             let mut stream = if let Ok(s) = strm {
                 s
             } else {
+                log::error!("Connection error: {:?}", strm.unwrap_err());
                 continue;
             };
 
@@ -65,10 +66,10 @@ fn main() -> io::Result<()> {
                 let result =
                     handlers::entrance(&acceptor, &mut stream, &conf).await;
                 match result {
-                    Ok(_) => {},
+                    Ok(_) => {}
                     Err(e) => {
                         log::error!("{}", e);
-                    },
+                    }
                 }
             });
         }
