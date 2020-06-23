@@ -27,3 +27,8 @@ but the tree will be mirrored to [github.com/gbmor/laika](https://github.com/gbm
 
 * Send patches to: [~gbmor/laika@lists.sr.ht](mailto:~gbmor/laika@lists.sr.ht) 
 * Bug tracker: [https://todo.sr.ht/~gbmor/laika](https://todo.sr.ht/~gbmor/laika)
+
+### Notes
+
+* Gemini project homepage: [https://gemini.circumlunar.space/](https://gemini.circumlunar.space/)
+* Spec: [https://gemini.circumlunar.space/docs/specification.html](https://gemini.circumlunar.space/docs/specification.html)
