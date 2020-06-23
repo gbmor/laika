@@ -6,6 +6,7 @@ use async_std::{
 };
 
 mod conf;
+mod err;
 mod files;
 mod handlers;
 mod logging;
@@ -39,7 +40,12 @@ fn main() -> io::Result<()> {
         let bind_addr = bind_addr.unwrap().next().unwrap();
         let listener =
             TcpListener::bind(&bind_addr).await.unwrap_or_else(|e| {
-                panic!("Could not bind to {}:{} :: {}", conf.ip, conf.port, e)
+                err::notify_then_exit(&format!(
+                    "Fatal: Could not bind to {}:{} :: {}",
+                    conf.ip, conf.port, e
+                ));
+                // rustc complains about return types even though this is unreachable
+                panic!();
             });
 
         log::info!("Bound to {}", bind_addr_string);

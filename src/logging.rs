@@ -2,11 +2,15 @@ use std::fs::OpenOptions;
 
 use simplelog::{Config, LevelFilter, WriteLogger};
 
+use crate::err;
+
 pub fn init(file: &str) {
     let logfile = match OpenOptions::new().append(true).create(true).open(file)
     {
         Err(e) => {
-            panic!("Could not open log file: {}", e);
+            err::notify_then_exit(&format!("Could not open log file: {}", e));
+            // rustc complains about incompatible branches even though this is unreachable
+            panic!();
         }
         Ok(f) => f,
     };
@@ -14,7 +18,7 @@ pub fn init(file: &str) {
     if let Err(e) =
         WriteLogger::init(LevelFilter::Info, Config::default(), logfile)
     {
-        panic!("Could not initiate logging: {}", e);
+        err::notify_then_exit(&format!("Could not initiate logging: {}", e));
     }
 }
 
