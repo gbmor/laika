@@ -37,9 +37,10 @@ fn main() -> io::Result<()> {
         let bind_addr_string = format!("{}:{}", conf.ip, conf.port);
         let bind_addr = bind_addr_string.to_socket_addrs().await;
         let bind_addr = bind_addr.unwrap().next().unwrap();
-        let listener = TcpListener::bind(&bind_addr)
-            .await
-            .expect(&format!("Could not bind to {}:{}", conf.ip, conf.port));
+        let listener =
+            TcpListener::bind(&bind_addr).await.unwrap_or_else(|e| {
+                panic!("Could not bind to {}:{} :: {}", conf.ip, conf.port, e)
+            });
 
         log::info!("Bound to {}", bind_addr_string);
 

@@ -1,6 +1,5 @@
 use async_std::{io, net::TcpStream, prelude::*};
 use async_tls::server::TlsStream;
-use tree_magic;
 
 use std::fs;
 
@@ -42,7 +41,7 @@ pub async fn parse(
     let fullpath = if metadata.file_type().is_dir() {
         format!("{}/index.gmi", path)
     } else {
-        format!("{}", path)
+        path.to_string()
     };
 
     let fi = match fs::read(&fullpath) {

@@ -26,6 +26,7 @@ pub struct Conf {
 impl Conf {
     // Parses the command line flags and returns a Conf.
     // Sets defaults if flags are omitted.
+    #[allow(clippy::too_many_lines)] // kick rocks, clippy
     pub fn get() -> Conf {
         let matches = App::new("laika")
             .version(clap::crate_version!())
@@ -175,26 +176,24 @@ impl Conf {
                 .group(self.group.as_ref());
 
             match daemon.start() {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(e) => {
                     log::error!("Could not daemonize: {}", e);
                     std::process::exit(1);
-                },
+                }
             }
-        } else {
-            if let Err(e) = privdrop::PrivDrop::default()
-                .user(&self.user)
-                .group(&self.group)
-                .apply()
-            {
-                log::error!(
-                    "Couldn't drop privileges to user {}, group {}: {}",
-                    self.user,
-                    self.group,
-                    e
-                );
-                std::process::exit(1);
-            }
+        } else if let Err(e) = privdrop::PrivDrop::default()
+            .user(&self.user)
+            .group(&self.group)
+            .apply()
+        {
+            log::error!(
+                "Couldn't drop privileges to user {}, group {}: {}",
+                self.user,
+                self.group,
+                e
+            );
+            std::process::exit(1);
         }
     }
 }

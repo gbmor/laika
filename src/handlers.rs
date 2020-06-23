@@ -106,7 +106,7 @@ async fn serve_from_root(
 ) -> io::Result<()> {
     let fixedpath = if path == "" {
         format!("{}/index.gmi", rootdir)
-    } else if path.ends_with("/") {
+    } else if path.ends_with('/') {
         format!("{}{}index.gmi", rootdir, path)
     } else {
         format!("{}{}", rootdir, path)

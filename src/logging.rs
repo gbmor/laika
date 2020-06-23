@@ -1,13 +1,13 @@
 use std::fs::OpenOptions;
 
-use simplelog::*;
+use simplelog::{Config, LevelFilter, WriteLogger};
 
 pub fn init(file: &str) {
     let logfile = match OpenOptions::new().append(true).create(true).open(file)
     {
         Err(e) => {
             panic!("Could not open log file: {}", e);
-        },
+        }
         Ok(f) => f,
     };
 
@@ -24,8 +24,12 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn init_bad_file() { init("/var/log/wrongfile_laika.log"); }
+    fn init_bad_file() {
+        init("/var/log/wrongfile_laika.log");
+    }
 
     #[test]
-    fn init_good_file() { init("/tmp/laika.log"); }
+    fn init_good_file() {
+        init("/tmp/laika.log");
+    }
 }
