@@ -28,10 +28,10 @@ impl Conf {
     // Sets defaults if flags are omitted.
     #[allow(clippy::too_many_lines)] // kick rocks, clippy
     pub fn get() -> Conf {
-        let matches = App::new("laika")
+        let matches = App::new(clap::crate_name!())
             .version(clap::crate_version!())
             .author("Ben Morrison <ben@gbmor.dev>")
-            .about("Gemini protocol server")
+            .about(clap::crate_description!())
             .arg(
                 Arg::with_name("ip")
                     .short("i")

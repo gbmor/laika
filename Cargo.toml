@@ -2,6 +2,7 @@
 name = "laika"
 version = "0.1.0"
 authors = ["Ben Morrison <ben@gbmor.dev>"]
+description = "async Gemini protocol server"
 license = "MIT"
 edition = "2018"
 
