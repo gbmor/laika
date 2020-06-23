@@ -27,12 +27,6 @@ mod tests {
     use super::*;
 
     #[test]
-    #[should_panic]
-    fn init_bad_file() {
-        init("/var/log/wrongfile_laika.log");
-    }
-
-    #[test]
     fn init_good_file() {
         init("/tmp/laika.log");
     }
