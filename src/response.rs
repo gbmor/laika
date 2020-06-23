@@ -1,6 +1,7 @@
 use std::fmt;
 
 // Response codes
+#[allow(dead_code)]
 #[derive(Clone, Copy)]
 pub enum Code {
     Input = 10,

@@ -9,8 +9,6 @@ mod conf;
 mod files;
 mod handlers;
 mod logging;
-
-#[allow(dead_code)]
 mod response;
 
 fn main() -> io::Result<()> {
