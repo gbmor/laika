@@ -117,10 +117,7 @@ impl Conf {
                 .value_of("logfile")
                 .unwrap_or("/var/log/laika.log")
                 .into(),
-            rootdir: matches
-                .value_of("rootdir")
-                .unwrap_or("/var/gemini")
-                .into(),
+            rootdir: matches.value_of("rootdir").unwrap_or("/var/gemini").into(),
             tls_cert: matches
                 .value_of("cert")
                 .unwrap_or("/etc/ssl/laika.pem")
@@ -137,16 +134,14 @@ impl Conf {
 
     // Pull certificate file
     fn get_cert(path: &Path) -> io::Result<Vec<Certificate>> {
-        certs(&mut BufReader::new(File::open(path)?)).map_err(|_| {
-            io::Error::new(io::ErrorKind::InvalidInput, "invalid cert")
-        })
+        certs(&mut BufReader::new(File::open(path)?))
+            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid cert"))
     }
 
     // Pull private key
     fn get_key(path: &Path) -> io::Result<Vec<PrivateKey>> {
-        pkcs8_private_keys(&mut BufReader::new(File::open(path)?)).map_err(
-            |_| io::Error::new(io::ErrorKind::InvalidInput, "invalid key"),
-        )
+        pkcs8_private_keys(&mut BufReader::new(File::open(path)?))
+            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid key"))
     }
 
     // Generate the tls server config

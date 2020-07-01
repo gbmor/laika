@@ -36,6 +36,5 @@ impl fmt::Display for Code {
 
 // Appended to the bottom of .gmi files
 pub fn footer_bytes<'a>() -> &'a [u8] {
-    "\n\n~~~~ served by laika ~~~~~~~~~\nhttps://github.com/gbmor/laika\n\n"
-        .as_bytes()
+    "\n\n~~~~ served by laika ~~~~~~~~~\nhttps://github.com/gbmor/laika\n\n".as_bytes()
 }

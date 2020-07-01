@@ -16,18 +16,11 @@ pub async fn parse(
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
                 let msg = format!("{} NOT FOUND\r\n", response::Code::NotFound);
-                log::error!(
-                    "REQ :: {} NOT FOUND :: {}",
-                    response::Code::NotFound,
-                    e
-                );
+                log::error!("REQ :: {} NOT FOUND :: {}", response::Code::NotFound, e);
                 tls_stream.write_all(msg.as_bytes()).await?;
                 return Err(e);
             }
-            let msg = format!(
-                "{} TEMPORARY FAILURE\r\n",
-                response::Code::TemporaryFailure
-            );
+            let msg = format!("{} TEMPORARY FAILURE\r\n", response::Code::TemporaryFailure);
             log::error!(
                 "REQ :: {} TEMPORARY FAILURE :: {}",
                 response::Code::TemporaryFailure,
@@ -49,18 +42,11 @@ pub async fn parse(
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
                 let msg = format!("{} NOT FOUND\r\n", response::Code::NotFound);
-                log::error!(
-                    "REQ :: {} NOT FOUND :: {}",
-                    response::Code::NotFound,
-                    e
-                );
+                log::error!("REQ :: {} NOT FOUND :: {}", response::Code::NotFound, e);
                 tls_stream.write_all(msg.as_bytes()).await?;
                 return Err(e);
             }
-            let msg = format!(
-                "{} TEMPORARY FAILURE\r\n",
-                response::Code::TemporaryFailure
-            );
+            let msg = format!("{} TEMPORARY FAILURE\r\n", response::Code::TemporaryFailure);
             log::error!(
                 "REQ :: {} TEMPORARY FAILURE :: {}",
                 response::Code::TemporaryFailure,

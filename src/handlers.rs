@@ -22,11 +22,7 @@ pub async fn entrance(
     let n = match tls_stream.read(&mut req_buf).await {
         Ok(n) => n,
         Err(e) => {
-            log::error!(
-                "REQ from {} :: Failed to read from socket: {}",
-                addr,
-                e
-            );
+            log::error!("REQ from {} :: Failed to read from socket: {}", addr, e);
             return Err(e);
         }
     };
@@ -57,11 +53,7 @@ pub async fn entrance(
     let url = match Url::parse(req_str) {
         Ok(url) => url,
         Err(e) => {
-            log::error!(
-                "REQ from {} :: Unable to parse request as URL: {}",
-                addr,
-                e
-            );
+            log::error!("REQ from {} :: Unable to parse request as URL: {}", addr, e);
             return Ok(());
         }
     };

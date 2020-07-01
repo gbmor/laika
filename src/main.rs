@@ -38,15 +38,14 @@ fn main() -> io::Result<()> {
         let bind_addr_string = format!("{}:{}", conf.ip, conf.port);
         let bind_addr = bind_addr_string.to_socket_addrs().await;
         let bind_addr = bind_addr.unwrap().next().unwrap();
-        let listener =
-            TcpListener::bind(&bind_addr).await.unwrap_or_else(|e| {
-                err::notify_then_exit(&format!(
-                    "Fatal: Could not bind to {}:{} :: {}",
-                    conf.ip, conf.port, e
-                ));
-                // rustc complains about return types even though this is unreachable
-                panic!();
-            });
+        let listener = TcpListener::bind(&bind_addr).await.unwrap_or_else(|e| {
+            err::notify_then_exit(&format!(
+                "Fatal: Could not bind to {}:{} :: {}",
+                conf.ip, conf.port, e
+            ));
+            // rustc complains about return types even though this is unreachable
+            panic!();
+        });
 
         log::info!("Bound to {}", bind_addr_string);
 
@@ -68,8 +67,7 @@ fn main() -> io::Result<()> {
             let acceptor = acceptor.clone();
 
             task::spawn(async move {
-                let result =
-                    handlers::entrance(&acceptor, &mut stream, &conf).await;
+                let result = handlers::entrance(&acceptor, &mut stream, &conf).await;
                 match result {
                     Ok(_) => {}
                     Err(e) => {
