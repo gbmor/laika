@@ -5,6 +5,7 @@ authors = ["gbmor"]
 description = "async Gemini protocol server"
 license = "AGPL-3.0-or-later"
 edition = "2021"
+repository = "https://git.sr.ht/~gbmor/laika"
 
 [dependencies]
 argh = "^0.1.10"
