@@ -1,0 +1,9 @@
+---
+bind_address: "0.0.0.0:1965"
+tls_key: "laika.key"
+tls_cert: "laika.crt"
+index_file_name: "index.gmi"
+log_file: "stderr"
+root_directory: "/var/gemini"
+debug: false
+

@@ -1,0 +1,54 @@
+[package]
+name = "laika"
+version = "0.1.0"
+authors = ["gbmor"]
+description = "async Gemini protocol server"
+license = "AGPL-3.0-or-later"
+edition = "2021"
+
+[dependencies]
+argh = "^0.1.10"
+log = "^0.4.19"
+rustls-pemfile = "^1.0.2"
+serde = { version = "^1.0.164", features = ["derive"] }
+serde_yaml = "^0.9.21"
+simplelog = "^0.12.1"
+tokio = { version = "^1.28.2", features = ["full"] }
+tokio-rustls = "^0.24.1"
+tree_magic_mini = "^3.0.3"
+url = "^2.4.0"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+debug = false
+debug-assertions = false
+overflow-checks = false
+panic = "abort"
+incremental = true
+
+[profile.dev]
+opt-level = 0
+lto = false
+debug = true
+debug-assertions = true
+overflow-checks = true
+panic = "unwind"
+incremental = true
+
+[profile.bench]
+opt-level = 3
+lto = "thin"
+debug = false
+debug-assertions = false
+overflow-checks = false
+incremental = true
+
+[profile.test]
+opt-level = 0
+lto = false
+debug = true
+debug-assertions = true
+overflow-checks = true
+incremental = true
+
