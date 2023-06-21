@@ -57,27 +57,27 @@ impl Code {
 
 impl fmt::Display for Code {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let code_str = format!("{}", *self as u8);
+        let code_u8 = *self as u8;
         let msg = match self {
-            Code::Unknown => format!("{} UNKNOWN", code_str),
-            Code::Input => format!("{} INPUT", code_str),
-            Code::SensitiveInput => format!("{} SENSITIVE INPUT", code_str),
-            Code::Success => format!("{}", code_str),
-            Code::RedirectTemporary => format!("{} REDIRECT - TEMPORARY", code_str),
-            Code::RedirectPermanent => format!("{} REDIRECT - PERMANENT", code_str),
-            Code::TemporaryFailure => format!("{} TEMPORARY FAILURE", code_str),
-            Code::ServerUnavailable => format!("{} SERVER UNAVAILABLE", code_str),
-            Code::CgiError => format!("{} CGI ERROR", code_str),
-            Code::ProxyError => format!("{} PROXY ERROR", code_str),
-            Code::SlowDown => format!("{} SLOW DOWN", code_str),
-            Code::PermanentFailure => format!("{} PERMANENT FAILURE", code_str),
-            Code::NotFound => format!("{} NOT FOUND", code_str),
-            Code::Gone => format!("{} GONE", code_str),
-            Code::ProxyRequestRefused => format!("{} PROXY REQUEST REFUSED", code_str),
-            Code::BadRequest => format!("{} BAD REQUEST", code_str),
-            Code::ClientCertificateRequired => format!("{} CLIENT CERTIFICATE REQUIRED", code_str),
-            Code::CertificateNotAuthorised => format!("{} CERTIFICATE NOT AUTHORISED", code_str),
-            Code::CertificateNotValid => format!("{} CERTIFICATE NOT VALID", code_str),
+            Code::Unknown => format!("{} UNKNOWN", code_u8),
+            Code::Input => format!("{} INPUT", code_u8),
+            Code::SensitiveInput => format!("{} SENSITIVE INPUT", code_u8),
+            Code::Success => format!("{}", code_u8),
+            Code::RedirectTemporary => format!("{} REDIRECT - TEMPORARY", code_u8),
+            Code::RedirectPermanent => format!("{} REDIRECT - PERMANENT", code_u8),
+            Code::TemporaryFailure => format!("{} TEMPORARY FAILURE", code_u8),
+            Code::ServerUnavailable => format!("{} SERVER UNAVAILABLE", code_u8),
+            Code::CgiError => format!("{} CGI ERROR", code_u8),
+            Code::ProxyError => format!("{} PROXY ERROR", code_u8),
+            Code::SlowDown => format!("{} SLOW DOWN", code_u8),
+            Code::PermanentFailure => format!("{} PERMANENT FAILURE", code_u8),
+            Code::NotFound => format!("{} NOT FOUND", code_u8),
+            Code::Gone => format!("{} GONE", code_u8),
+            Code::ProxyRequestRefused => format!("{} PROXY REQUEST REFUSED", code_u8),
+            Code::BadRequest => format!("{} BAD REQUEST", code_u8),
+            Code::ClientCertificateRequired => format!("{} CLIENT CERTIFICATE REQUIRED", code_u8),
+            Code::CertificateNotAuthorised => format!("{} CERTIFICATE NOT AUTHORISED", code_u8),
+            Code::CertificateNotValid => format!("{} CERTIFICATE NOT VALID", code_u8),
         };
 
         write!(f, "{}", msg)
