@@ -49,3 +49,19 @@ impl std::fmt::Display for Supernova {
         write!(f, "{}", &self.message)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_supernova() {
+        let mut sn = Supernova::boom("test");
+        assert_eq!(sn.code(), response::Code::Unknown);
+
+        sn.with_code(response::Code::BadRequest);
+        assert_eq!(sn.code(), response::Code::BadRequest);
+
+        assert_eq!(format!("{}", sn), String::from("test"));
+    }
+}
